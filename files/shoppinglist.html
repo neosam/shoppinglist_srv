@@ -1,0 +1,23 @@
+<h1>Shopping List</h1>
+<ul>
+    <li ng-repeat="item in vm.list">{{item.amount}}x {{item.name}}</li>
+</ul>
+
+<h1>Manual add ingredients</h1>
+<ul>
+    <li ng-repeat="ingredient in vm.ingredientFilterFn()" ng-class="{
+                active: ingredient.key === vm.selectedIngredient.key
+            }" ng-click="vm.selectIngredient(ingredient)">
+        {{ingredient.name}}
+    </li>
+</ul>
+
+<input ng-model="vm.ingredientFilter"/>
+
+
+<input ng-model="vm.newAmount" type="number"/>
+
+<button ng-click="vm.add()">Add to list</button><br/>
+
+<button ng-click="vm.addIngredient()">Add to ingredients</button>
+
