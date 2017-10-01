@@ -36,6 +36,7 @@
         vm.selectIngredient = selectIngredient;
         vm.addToRecipe = addToRecipe;
         vm.addRecipeToList = addRecipeToList;
+        vm.save = save;
         vm.newAmount = 0;
         $http.get('../get-recipes')
             .then(function (request) {
@@ -95,6 +96,9 @@
 
         function addRecipeToList(recipe) {
             $http.get('../add-recipe-to-list?multiplier=1&recipe_key=' + recipe.key);
+        }
+        function save() {
+            $http.get("../save");
         }
     }
 
@@ -175,7 +179,9 @@
 
         function combinedList() {
             console.log(vm.list);
-            vm.groupedList = {};
+            _.each(vm.groupedList, function (item) {
+                item.amount = 0;
+            })
             _.each(vm.list, function (ingredient) {
                 if (vm.groupedList[ingredient.ingredient_key] === undefined) {
                     vm.groupedList[ingredient.ingredient_key] = {
@@ -187,7 +193,7 @@
                     vm.groupedList[ingredient.ingredient_key].amount += ingredient.amount;
                 }
             });
-            return vm.groupedList;
+            return _.filter(vm.groupedList, function (item) { return item.amount > 0 });
         }
     }
 

@@ -7,6 +7,7 @@ extern crate shoppinglist;
 extern crate serde_json;
 extern crate uuid;
 #[macro_use] extern crate serde_derive;
+extern crate serde_yaml;
 
 use rocket::State;
 use rocket::response::content::Content;
@@ -14,6 +15,8 @@ use rocket::http::ContentType;
 use shoppinglist::*;
 use std::fs::File;
 use std::io::Read;
+use std::io::Write;
+use std::ops::Deref;
 
 use uuid::Uuid;
 
@@ -21,6 +24,8 @@ use std::cell::RefCell;
 use std::sync::Mutex;
 
 type DefaultState = Mutex<RefCell<ShoppingList>>;
+
+const SAVE_FILE: &str = "data.yaml";
 
 #[get("/")]
 fn index() -> &'static str {
@@ -164,6 +169,16 @@ fn add_recipe_to_list(shoppinglist: State<DefaultState>, form: AddRecipeToListFo
     "true"
 }
 
+#[get("/save")]
+fn save(shoppinglist: State<DefaultState>) -> &str {
+    let shoppinglist = shoppinglist.lock().unwrap();
+    let shoppinglist = shoppinglist.borrow();
+    if let Ok(file) = File::create(SAVE_FILE) {
+        serde_yaml::to_writer(file,shoppinglist.deref());
+    }
+    "true"
+}
+
 
 #[get("/file/<path>")]
 fn file(path: String) -> Content<Vec<u8>> {
@@ -189,7 +204,10 @@ fn file(path: String) -> Content<Vec<u8>> {
 
 fn main() {
     let r = rocket::ignite();
-    let shoppinglist = ShoppingList::new();
+    let mut shoppinglist = ShoppingList::new();
+    if let Ok(read_file) = File::open(SAVE_FILE) {
+        shoppinglist = serde_yaml::from_reader(read_file).unwrap_or(shoppinglist);
+    }
     let r = r.manage(Mutex::new(RefCell::new(shoppinglist)));
     let r = r.mount("/", routes![
         index,
@@ -201,6 +219,7 @@ fn main() {
         get_shoppinglist,
         add_shoppinglist,
         add_recipe_to_list,
+        save,
         file]);
     r.launch();
 }
