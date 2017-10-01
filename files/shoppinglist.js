@@ -116,6 +116,7 @@
     function ShoppinglistController($http) {
         var vm = this;
         vm.list = [];
+        vm.groupedList = {};
         vm.newIngredient = "";
         vm.selectedIngredient = null;
         vm.ingredients = [];
@@ -125,6 +126,7 @@
         vm.ingredientFilterFn = ingredientFilterFn;
         vm.addIngredient = addIngredient;
         vm.selectIngredient = selectIngredient;
+        vm.combinedList = combinedList;
         $http.get('../get-shoppinglist')
             .then(function (request) {
                 vm.list = request.data;
@@ -169,6 +171,23 @@
 
         function selectIngredient(ingredientKey) {
             vm.selectedIngredient = ingredientKey;
+        }
+
+        function combinedList() {
+            console.log(vm.list);
+            vm.groupedList = {};
+            _.each(vm.list, function (ingredient) {
+                if (vm.groupedList[ingredient.ingredient_key] === undefined) {
+                    vm.groupedList[ingredient.ingredient_key] = {
+                        name: ingredient.name,
+                        amount: ingredient.amount
+
+                    };
+                } else {
+                    vm.groupedList[ingredient.ingredient_key].amount += ingredient.amount;
+                }
+            });
+            return vm.groupedList;
         }
     }
 
