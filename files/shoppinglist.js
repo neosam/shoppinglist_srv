@@ -35,6 +35,7 @@
         vm.addIngredient = addIngredient;
         vm.selectIngredient = selectIngredient;
         vm.addToRecipe = addToRecipe;
+        vm.addRecipeToList = addRecipeToList;
         vm.newAmount = 0;
         $http.get('../get-recipes')
             .then(function (request) {
@@ -91,6 +92,10 @@
         function selectIngredient(ingredientKey) {
             vm.selectedIngredient = ingredientKey;
         }
+
+        function addRecipeToList(recipe) {
+            $http.get('../add-recipe-to-list?multiplier=1&recipe_key=' + recipe.key);
+        }
     }
 
 
@@ -145,6 +150,7 @@
             vm.newIngredient = "";
             vm.newAmount = 0;
         }
+
 
         function ingredientFilterFn() {
             return _.filter(vm.ingredients, function (ingredient) {

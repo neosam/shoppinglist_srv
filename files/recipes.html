@@ -2,7 +2,10 @@
 <ul>
     <div class="col-sm-12">
         <li ng-repeat="recipe in vm.recipes"
-            ng-click="vm.selectRecipe(recipe)">{{recipe.name}}</li>
+            ng-click="vm.selectRecipe(recipe)">
+                <span ng-click="vm.selectRecipe(recipe)">{{recipe.name}}</span>
+                <a href="#" ng-click="vm.addRecipeToList(recipe)">(Add to list)</a>
+        </li>
     </div>
 </ul>
 <form>

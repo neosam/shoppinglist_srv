@@ -149,6 +149,22 @@ fn add_ingredient_to_recipe(shoppinglist: State<DefaultState>, form: AddIngredie
     "true"
 }
 
+#[derive(FromForm)]
+struct AddRecipeToListForm {
+    recipe_key: String,
+    multiplier: f32
+}
+
+#[get("/add-recipe-to-list?<form>")]
+fn add_recipe_to_list(shoppinglist: State<DefaultState>, form: AddRecipeToListForm) -> &str {
+    let shoppinglist = shoppinglist.lock().unwrap();
+    let mut shoppinglist = shoppinglist.borrow_mut();
+    shoppinglist.add_recipe_to_list(Key::new(Uuid::parse_str(&form.recipe_key).unwrap()),
+        form.multiplier);
+    "true"
+}
+
+
 #[get("/file/<path>")]
 fn file(path: String) -> Content<Vec<u8>> {
     let mut result = Vec::new();
@@ -184,6 +200,7 @@ fn main() {
         add_ingredient_to_recipe,
         get_shoppinglist,
         add_shoppinglist,
+        add_recipe_to_list,
         file]);
     r.launch();
 }
