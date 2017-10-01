@@ -1,7 +1,8 @@
 <h1>Recipes</h1>
 <ul>
     <div class="col-sm-12">
-        <li ng-repeat="recipe in vm.recipes">{{recipe.name}}</li>
+        <li ng-repeat="recipe in vm.recipes"
+            ng-click="vm.selectRecipe(recipe)">{{recipe.name}}</li>
     </div>
 </ul>
 <form>
@@ -12,3 +13,30 @@
         </div>
     </div>
 </form>
+
+<h2>Selected Recipe</h2>
+<div ng-hide="vm.selectedRecipe === null">
+    Name: {{vm.selectedRecipe.name}}
+    <h2>Ingredients</h2>
+    <ul>
+        <li ng-repeat="ingredient in vm.selectedRecipe.ingredients">{{ingredient.amount}}x {{ingredient.ingredient.name}}</li>
+    </ul>
+
+<h2>Manual add ingredients</h2>
+<ul>
+    <li ng-repeat="ingredient in vm.ingredientFilterFn()" ng-class="{
+                active: ingredient.key === vm.selectedIngredient.key
+            }" ng-click="vm.selectIngredient(ingredient)">
+        {{ingredient.name}}
+    </li>
+</ul>
+
+<input ng-model="vm.ingredientFilter"/>
+
+
+<input ng-model="vm.newAmount" type="number"/>
+
+<button ng-click="vm.addToRecipe()">Add to list</button><br/>
+
+<button ng-click="vm.addIngredient()">Add to ingredients</button>
+</div>

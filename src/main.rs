@@ -27,12 +27,31 @@ fn index() -> &'static str {
     "Hello world"
 }
 
+#[derive(Serialize)]
+struct RecipeIngredient {
+    ingredient: Ingredient,
+    amount: f32
+}
+#[derive(Serialize)]
+struct RecipeResponse {
+    key: Uuid,
+    name: String,
+    ingredients: Vec<RecipeIngredient>
+}
+
 #[get("/get-recipes")]
 fn get_recipes(shoppinglist: State<DefaultState>) -> String {
     let shoppinglist = shoppinglist.lock().unwrap();
     let shoppinglist = shoppinglist.borrow();
-    let recipes : Vec<Recipe>= shoppinglist.recipe_iter()
-        .map(|x| x.clone())
+    let recipes : Vec<RecipeResponse> = shoppinglist.recipe_iter()
+        .map(|x : &Recipe | RecipeResponse {
+            key: x.key.clone(),
+            name: x.name.clone(),
+            ingredients: x.ingredients.iter().map(|&(ingredient_id, amount)| RecipeIngredient {
+                ingredient: shoppinglist.ingredient(Key::new(ingredient_id)).clone(),
+                amount
+            }).collect()
+        })
         .collect();
     serde_json::to_string(&recipes).unwrap()
 }
